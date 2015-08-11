@@ -12,9 +12,11 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  ******************************************************************************/
-package com.amazonaws.services.kinesis.log4j.helpers;
+package com.amazonaws.services.kinesis.logback.helpers;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.joda.time.format.PeriodFormat;
@@ -22,21 +24,23 @@ import org.joda.time.format.PeriodFormat;
 import com.amazonaws.handlers.AsyncHandler;
 import com.amazonaws.services.kinesis.model.PutRecordRequest;
 import com.amazonaws.services.kinesis.model.PutRecordResult;
+import com.amazonaws.services.kinesis.logback.KinesisAppender;
 
 /**
  * Gathers information on how many put requests made by AWS SDK's async client,
  * succeeded or failed since the beginning
  */
 public class AsyncPutCallStatsReporter implements AsyncHandler<PutRecordRequest, PutRecordResult> {
-  private static Logger logger = Logger.getLogger(AsyncPutCallStatsReporter.class);
+
   private String appenderName;
   private long successfulRequestCount;
   private long failedRequestCount;
   private DateTime startTime;
+  private KinesisAppender appender;
 
-  public AsyncPutCallStatsReporter(String appenderName) {
-    this.appenderName = appenderName;
-    this.startTime = DateTime.now();
+  public AsyncPutCallStatsReporter(KinesisAppender appender) {
+    this.appenderName = appender.getStreamName();
+    this.appender = appender;
   }
 
   /**
@@ -47,7 +51,7 @@ public class AsyncPutCallStatsReporter implements AsyncHandler<PutRecordRequest,
   @Override
   public void onError(Exception exception) {
     failedRequestCount++;
-    logger.error("Failed to publish a log entry to kinesis using appender: " + appenderName, exception);
+    appender.addError("Failed to publish a log entry to kinesis using appender: " + appenderName, exception);
   }
 
   /**
@@ -58,10 +62,5 @@ public class AsyncPutCallStatsReporter implements AsyncHandler<PutRecordRequest,
   @Override
   public void onSuccess(PutRecordRequest request, PutRecordResult result) {
     successfulRequestCount++;
-    if (logger.isDebugEnabled() && (successfulRequestCount + failedRequestCount) % 3000 == 0) {
-      logger.debug("Appender (" + appenderName + ") made " + successfulRequestCount
-          + " successful put requests out of total " + (successfulRequestCount + failedRequestCount) + " in "
-          + PeriodFormat.getDefault().print(new Period(startTime, DateTime.now())) + " since start");
-    }
   }
 }

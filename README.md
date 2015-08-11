@@ -1,4 +1,9 @@
-# Log4J Appender for Amazon Kinesis
+# LOGBack Appender for Amazon Kinesis
+
+This is an implementation of the [AWS - Labs log4j appender](https://github.com/awslabs/kinesis-log4j-appender) for LOGBack.
+
+**Currently a work in progress**
+
 
 The Log4J Appender for Amazon Kinesis enables customers to publish logs from their Java applications into an Amazon Kinesis stream. We also provide a publisher application which uses the Log4J Appender for Amazon Kinesis to publish data from a file into an Amazon Kinesis stream.
 
