@@ -44,6 +44,9 @@ import com.amazonaws.services.kinesis.model.PutRecordRequest;
 import com.amazonaws.services.kinesis.model.ResourceNotFoundException;
 import com.amazonaws.services.kinesis.model.StreamStatus;
 
+import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.auth.STSAssumeRoleSessionCredentialsProvider;
+
 /**
  * LOGBack Appender implementation to support sending data from java applications
  * directly into a Kinesis stream.
@@ -58,14 +61,18 @@ public class KinesisAppender extends AppenderBase<ILoggingEvent> {
     private int bufferSize = AppenderConstants.DEFAULT_BUFFER_SIZE;
     private int threadCount = AppenderConstants.DEFAULT_THREAD_COUNT;
     private int shutdownTimeout = AppenderConstants.DEFAULT_SHUTDOWN_TIMEOUT_SEC;
+
     private String endpoint;
     private String region;
     private String streamName;
+    private String roleToAssumeArn;
+
     private boolean initializationFailed = false;
     private BlockingQueue<Runnable> taskBuffer;
     private AmazonKinesisAsyncClient kinesisClient;
     private AsyncPutCallStatsReporter asyncCallHander;
     private LayoutBase layout;
+    private AWSCredentialsProvider credentials;
 
     public LayoutBase getLayout() {
         return layout;
@@ -100,6 +107,18 @@ public class KinesisAppender extends AppenderBase<ILoggingEvent> {
             return;
         }
 
+        CustomCredentialsProviderChain localAccountCredentials = new CustomCredentialsProviderChain();
+
+        if (Validator.isBlank(roleToAssumeArn)) {
+            credentials = localAccountCredentials; 
+        } else {
+            String sessionId = UUID.randomUUID().toString();
+            STSAssumeRoleSessionCredentialsProvider remoteAccountCredentials = new 
+                STSAssumeRoleSessionCredentialsProvider(localAccountCredentials, roleToAssumeArn, sessionId);
+
+            credentials = remoteAccountCredentials;
+        }
+
         ClientConfiguration clientConfiguration = new ClientConfiguration();
         clientConfiguration.setMaxErrorRetry(maxRetries);
         clientConfiguration.setRetryPolicy(new RetryPolicy(PredefinedRetryPolicies.DEFAULT_RETRY_CONDITION,
@@ -110,7 +129,7 @@ public class KinesisAppender extends AppenderBase<ILoggingEvent> {
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(threadCount, threadCount,
                 AppenderConstants.DEFAULT_THREAD_KEEP_ALIVE_SEC, TimeUnit.SECONDS, taskBuffer, new BlockFastProducerPolicy());
         threadPoolExecutor.prestartAllCoreThreads();
-        kinesisClient = new AmazonKinesisAsyncClient(new CustomCredentialsProviderChain(), clientConfiguration,
+        kinesisClient = new AmazonKinesisAsyncClient(credentials, clientConfiguration,
                 threadPoolExecutor);
 
         boolean regionProvided = !Validator.isBlank(region);
@@ -351,6 +370,14 @@ public class KinesisAppender extends AppenderBase<ILoggingEvent> {
      */
     public int getTaskBufferSize() {
         return taskBuffer.size();
+    }
+
+    public String getRoleToAssumeArn() {
+        return roleToAssumeArn;
+    }
+
+    public void setRoleToAssumeArn(String roleToAssumeArn) {
+        this.roleToAssumeArn = roleToAssumeArn;
     }
 
     /**

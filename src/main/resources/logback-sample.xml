@@ -4,6 +4,7 @@
     <bufferSize>1000</bufferSize>
     <threadCount>20</threadCount>
     <endpoint>kinesis.us-east-1.amazonaws.com</endpoint>
+    <roleToAssumeArn>foo</roleToAssumeArn>
     <maxRetries>3</maxRetries>
     <shutdownTimeout>30</shutdownTimeout>
     <streamName>testStream</streamName>
