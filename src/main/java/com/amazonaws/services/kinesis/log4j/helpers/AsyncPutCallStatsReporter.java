@@ -12,7 +12,8 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  ******************************************************************************/
-package com.amazonaws.services.kinesis.logback.helpers;
+
+package com.gu.logback.appender.kinesis.helpers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +25,7 @@ import org.joda.time.format.PeriodFormat;
 import com.amazonaws.handlers.AsyncHandler;
 import com.amazonaws.services.kinesis.model.PutRecordRequest;
 import com.amazonaws.services.kinesis.model.PutRecordResult;
-import com.amazonaws.services.kinesis.logback.KinesisAppender;
+import com.gu.logback.appender.kinesis.KinesisAppender;
 
 /**
  * Gathers information on how many put requests made by AWS SDK's async client,

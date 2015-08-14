@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  ******************************************************************************/
 
-package com.amazonaws.services.kinesis.logback;
+package com.gu.logback.appender.kinesis;
 
 import java.nio.ByteBuffer;
 import java.util.UUID;
@@ -35,10 +35,10 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.retry.PredefinedRetryPolicies;
 import com.amazonaws.retry.RetryPolicy;
 import com.amazonaws.services.kinesis.AmazonKinesisAsyncClient;
-import com.amazonaws.services.kinesis.logback.helpers.AsyncPutCallStatsReporter;
-import com.amazonaws.services.kinesis.logback.helpers.BlockFastProducerPolicy;
-import com.amazonaws.services.kinesis.logback.helpers.CustomCredentialsProviderChain;
-import com.amazonaws.services.kinesis.logback.helpers.Validator;
+import com.gu.logback.appender.kinesis.helpers.AsyncPutCallStatsReporter;
+import com.gu.logback.appender.kinesis.helpers.BlockFastProducerPolicy;
+import com.gu.logback.appender.kinesis.helpers.CustomCredentialsProviderChain;
+import com.gu.logback.appender.kinesis.helpers.Validator;
 import com.amazonaws.services.kinesis.model.DescribeStreamResult;
 import com.amazonaws.services.kinesis.model.PutRecordRequest;
 import com.amazonaws.services.kinesis.model.ResourceNotFoundException;

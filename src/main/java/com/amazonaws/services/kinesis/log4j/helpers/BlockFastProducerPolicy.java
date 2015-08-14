@@ -12,7 +12,7 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  ******************************************************************************/
-package com.amazonaws.services.kinesis.logback.helpers;
+package com.gu.logback.appender.kinesis.helpers;
 
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.RejectedExecutionHandler;

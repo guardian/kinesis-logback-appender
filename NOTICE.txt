@@ -1,2 +1,9 @@
+kinesis-logback-appender
+Modified Aug-2015 for theguardian.com by Robert Kenny <robert.kenny@guardian.co.uk>
+
+---
+
+Original Notice:
+
 kinesis-log4j-appender
 Copyright 2014 Amazon.com, Inc. or its affiliates. All Rights Reserved. 

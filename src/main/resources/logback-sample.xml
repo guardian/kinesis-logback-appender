@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <appender name="KINESIS" class="com.amazonaws.services.kinesis.log4j.KinesisAppender">
+  <appender name="KINESIS" class="com.gu.logback.appender.kinesis.KinesisAppender">
     <bufferSize>1000</bufferSize>
     <threadCount>20</threadCount>
     <endpoint>kinesis.us-east-1.amazonaws.com</endpoint>
