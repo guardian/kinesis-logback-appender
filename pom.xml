@@ -23,7 +23,35 @@
   <version>1.0.0</version>
 
   <name>LOGBack Appender for pushing logs to Kinesis</name>
+  <description>This is an implementation of the AWS - Labs log4j appender for LOGBack.</description>
   <url>https://github.com/guardian/kinesis-logback-appender</url>
+
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+      <comments>A business-friendly OSS license</comments>
+    </license>
+  </licenses>
+
+  <scm>
+    <connection>scm:git:https://github.com/guardian/kinesis-logback-appender</connection>
+    <developerConnection>scm:git:https://github.com/guardian/kinesis-logback-appender</developerConnection>
+    <tag>HEAD</tag>
+    <url>https://github.com/guardian/kinesis-logback-appender</url>
+  </scm>
+
+  <developers>
+    <developer>
+      <id>kenoir</id>
+      <name>Robert Kenny</name>
+      <email>robert.kenny@guardian.co.uk</email>
+      <url>https://github.com/kenoir</url>
+      <organization>The Guardian</organization>
+      <organizationUrl>http://www.theguardian.com</organizationUrl>
+    </developer>
+  </developers>
 
   <distributionManagement>
       <snapshotRepository>
