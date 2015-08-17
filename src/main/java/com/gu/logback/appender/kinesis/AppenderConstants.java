@@ -20,7 +20,7 @@ import com.amazonaws.regions.Regions;
  * Contains constants and default configuration values for the appender
  */
 public class AppenderConstants {
-  public static final String USER_AGENT_STRING = "kinesis-logback-appender/1.0.0";
+  public static final String USER_AGENT_STRING = "kinesis-logback-appender/1.0.1";
   // Default values
   public static final String DEFAULT_ENCODING = "UTF-8";
   public static final int DEFAULT_MAX_RETRY_COUNT = 3;
