@@ -22,8 +22,6 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import java.rmi.server.UID;
-
 import ch.qos.logback.core.LayoutBase;
 import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -114,7 +112,7 @@ public class KinesisAppender extends AppenderBase<ILoggingEvent> {
         if (Validator.isBlank(roleToAssumeArn)) {
             credentials = localAccountCredentials; 
         } else {
-            String sessionId = (new UID()).toString();
+            String sessionId = "session" + Math.random(); 
             STSAssumeRoleSessionCredentialsProvider remoteAccountCredentials = new 
                 STSAssumeRoleSessionCredentialsProvider(localAccountCredentials, roleToAssumeArn, sessionId);
 
