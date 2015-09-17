@@ -22,16 +22,13 @@ import com.amazonaws.auth.SystemPropertiesCredentialsProvider;
 
 /**
  * 
- * Custom credentials provider chain to look for AWS credentials. Implementation
- * will look for credentials in the following priority:
- * <ul>
- * <li>AwsCredentials.properties file in classpath (must contain accessKey and
- * secretKey keys)</li>
- * <li>Instance profile credentials delivered through the Amazon EC2 metadata
- * <li>Environment Variables - AWS_ACCESS_KEY_ID and AWS_SECRET_KEY</li>
- * <li>Java System Properties - aws.accessKeyId and aws.secretKey</li>
- * service</li>
- * <ul>
+ * Custom credentials provider chain to look for AWS credentials.
+ *
+ * Implementation will look for credentials in the following priority:
+ *  - AwsCredentials.properties file in classpath
+ *  - Instance profile credentials delivered through the Amazon EC2 metadata
+ *  - Environment Variables - AWS_ACCESS_KEY_ID and AWS_SECRET_KEY
+ *  - Java System Properties - aws.accessKeyId and aws.secretKey
  * 
  */
 public final class CustomCredentialsProviderChain extends AWSCredentialsProviderChain {

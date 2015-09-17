@@ -277,6 +277,8 @@ public class KinesisAppender extends AppenderBase<ILoggingEvent> {
      * communicating with Kinesis. This is used in AWS SDK's default retries for
      * HTTP exceptions, throttling errors etc.
      * 
+     * @param maxRetries 
+     * 		the number of retries between API failures		         
      */
     public void setMaxRetries(int maxRetries) {
         Validator.validate(maxRetries > 0, "maxRetries must be > 0");
@@ -298,6 +300,10 @@ public class KinesisAppender extends AppenderBase<ILoggingEvent> {
      * Configures buffer size for this appender. This implementation would buffer
      * these many log events in memory while parallel threads are trying to
      * publish them to Kinesis.
+     *
+     * @param bufferSize
+     * 		buffer size for this appender	
+     *
      */
     public void setBufferSize(int bufferSize) {
         Validator.validate(bufferSize > 0, "bufferSize must be >0");
@@ -318,6 +324,10 @@ public class KinesisAppender extends AppenderBase<ILoggingEvent> {
     /**
      * Configures number of parallel thread count that would work on publishing
      * buffered events to Kinesis
+     *
+     * @param parallelCount 
+     * 		number of parallel thread count 
+     *
      */
     public void setThreadCount(int parallelCount) {
         Validator.validate(parallelCount > 0, "threadCount must be >0");
@@ -343,6 +353,10 @@ public class KinesisAppender extends AppenderBase<ILoggingEvent> {
      * to send all buffered records to Kinesis. However if it fails to publish
      * them before timeout, it would drop those records and exit immediately after
      * timeout.
+     *
+     * @param shutdownTimeout 
+     * 		timeout between shutdown and clean up	
+     *
      */
     public void setShutdownTimeout(int shutdownTimeout) {
         Validator.validate(shutdownTimeout > 0, "shutdownTimeout must be >0");
