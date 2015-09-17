@@ -72,7 +72,7 @@ public class KinesisAppender extends AppenderBase<ILoggingEvent> {
     private AmazonKinesisAsyncClient kinesisClient;
     private AsyncPutCallStatsReporter asyncCallHander;
     private LayoutBase layout;
-    private AWSCredentialsProvider credentials;
+    private AWSCredentialsProvider credentials = new CustomCredentialsProviderChain();
 
     public LayoutBase getLayout() {
         return layout;
@@ -105,18 +105,6 @@ public class KinesisAppender extends AppenderBase<ILoggingEvent> {
             initializationFailed = true;
             addError("Invalid configuration - streamName cannot be null for appender: " + name);
             return;
-        }
-
-        CustomCredentialsProviderChain localAccountCredentials = new CustomCredentialsProviderChain();
-
-        if (Validator.isBlank(roleToAssumeArn)) {
-            credentials = localAccountCredentials; 
-        } else {
-            String sessionId = "session" + Math.random(); 
-            STSAssumeRoleSessionCredentialsProvider remoteAccountCredentials = new 
-                STSAssumeRoleSessionCredentialsProvider(localAccountCredentials, roleToAssumeArn, sessionId);
-
-            credentials = remoteAccountCredentials;
         }
 
         ClientConfiguration clientConfiguration = new ClientConfiguration();
@@ -378,6 +366,17 @@ public class KinesisAppender extends AppenderBase<ILoggingEvent> {
 
     public void setRoleToAssumeArn(String roleToAssumeArn) {
         this.roleToAssumeArn = roleToAssumeArn;
+        if (!Validator.isBlank(roleToAssumeArn)) {
+            String sessionId = "session" + Math.random(); 
+            STSAssumeRoleSessionCredentialsProvider remoteAccountCredentials = new 
+                STSAssumeRoleSessionCredentialsProvider(credentials, roleToAssumeArn, sessionId);
+
+            credentials = remoteAccountCredentials;
+        }
+    }
+    
+    public void setCredentialsProvider(AWSCredentialsProvider credentialsProvider) {
+        this.credentials = credentialsProvider;
     }
 
     /**
