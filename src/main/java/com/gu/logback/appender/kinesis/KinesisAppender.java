@@ -21,31 +21,25 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
-import ch.qos.logback.core.LayoutBase;
-import ch.qos.logback.core.AppenderBase;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.amazonaws.ClientConfiguration;
+import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.auth.STSAssumeRoleSessionCredentialsProvider;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.retry.PredefinedRetryPolicies;
 import com.amazonaws.retry.RetryPolicy;
 import com.amazonaws.services.kinesis.AmazonKinesisAsyncClient;
-import com.gu.logback.appender.kinesis.helpers.AsyncPutCallStatsReporter;
-import com.gu.logback.appender.kinesis.helpers.BlockFastProducerPolicy;
-import com.gu.logback.appender.kinesis.helpers.CustomCredentialsProviderChain;
-import com.gu.logback.appender.kinesis.helpers.Validator;
 import com.amazonaws.services.kinesis.model.DescribeStreamResult;
 import com.amazonaws.services.kinesis.model.PutRecordRequest;
 import com.amazonaws.services.kinesis.model.ResourceNotFoundException;
 import com.amazonaws.services.kinesis.model.StreamStatus;
-
-import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.STSAssumeRoleSessionCredentialsProvider;
+import com.gu.logback.appender.kinesis.helpers.AsyncPutCallStatsReporter;
+import com.gu.logback.appender.kinesis.helpers.BlockFastProducerPolicy;
+import com.gu.logback.appender.kinesis.helpers.CustomCredentialsProviderChain;
+import com.gu.logback.appender.kinesis.helpers.Validator;
+import ch.qos.logback.core.AppenderBase;
+import ch.qos.logback.core.LayoutBase;
+import ch.qos.logback.core.spi.DeferredProcessingAware;
 
 /**
  * LOGBack Appender implementation to support sending data from java applications
@@ -54,7 +48,7 @@ import com.amazonaws.auth.STSAssumeRoleSessionCredentialsProvider;
  * More details are available <a
  * href="https://github.com/guardian/kinesis-logback-appender">here</a>
  */
-public class KinesisAppender extends AppenderBase<ILoggingEvent> {
+public class KinesisAppender<Event extends DeferredProcessingAware> extends AppenderBase<Event> {
 
     private String encoding = AppenderConstants.DEFAULT_ENCODING;
     private int maxRetries = AppenderConstants.DEFAULT_MAX_RETRY_COUNT;
@@ -71,14 +65,14 @@ public class KinesisAppender extends AppenderBase<ILoggingEvent> {
     private BlockingQueue<Runnable> taskBuffer;
     private AmazonKinesisAsyncClient kinesisClient;
     private AsyncPutCallStatsReporter asyncCallHander;
-    private LayoutBase layout;
+    private LayoutBase<Event> layout;
     private AWSCredentialsProvider credentials = new CustomCredentialsProviderChain();
 
-    public LayoutBase getLayout() {
+    public LayoutBase<Event> getLayout() {
         return layout;
     }
 
-    public void setLayout(LayoutBase layout) {
+    public void setLayout(LayoutBase<Event>  layout) {
         this.layout = layout;
     }
 
@@ -196,7 +190,7 @@ public class KinesisAppender extends AppenderBase<ILoggingEvent> {
      * dropped.
      */
     @Override
-    protected void append(ILoggingEvent logEvent) {
+    protected void append(Event logEvent) {
         if (initializationFailed) {
             addError("Check the configuration and whether the configured stream " + streamName
                     + " exists and is active. Failed to initialize kinesis logback appender: " + name);
