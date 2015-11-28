@@ -33,11 +33,10 @@ import com.gu.logback.appender.kinesis.KinesisAppender;
  */
 public class AsyncPutCallStatsReporter implements AsyncHandler<PutRecordRequest, PutRecordResult> {
 
-  private String appenderName;
+  private final String appenderName;
   private long successfulRequestCount;
   private long failedRequestCount;
-  private DateTime startTime;
-  private KinesisAppender appender;
+  private final KinesisAppender appender;
 
   public AsyncPutCallStatsReporter(KinesisAppender appender) {
     this.appenderName = appender.getStreamName();

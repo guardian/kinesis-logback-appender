@@ -124,6 +124,7 @@ public class KinesisAppender extends AppenderBase<ILoggingEvent> {
         if (!regionProvided) {
             region = AppenderConstants.DEFAULT_REGION;
         }
+        kinesisClient.setRegion(Region.getRegion(Regions.fromName(region)));
         if (!Validator.isBlank(endpoint)) {
             if (regionProvided) {
                 addError("Received configuration for both region as well as Amazon Kinesis endpoint. ("
@@ -131,10 +132,7 @@ public class KinesisAppender extends AppenderBase<ILoggingEvent> {
                         + ") will be used as endpoint instead of default endpoint for region ("
                         + region + ")");
             }
-            kinesisClient.setEndpoint(endpoint,
-                    AppenderConstants.DEFAULT_SERVICE_NAME, region);
-        } else {
-            kinesisClient.setRegion(Region.getRegion(Regions.fromName(region)));
+            kinesisClient.setEndpoint(endpoint);
         }
 
         DescribeStreamResult describeResult = null;
@@ -256,8 +254,8 @@ public class KinesisAppender extends AppenderBase<ILoggingEvent> {
      *          encoding for expected log messages
      */
     public void setEncoding(String charset) {
-        Validator.validate(!Validator.isBlank(encoding), "encoding cannot be blank");
-        this.encoding = encoding.trim();
+        Validator.validate(!Validator.isBlank(charset), "encoding cannot be blank");
+        this.encoding = charset.trim();
     }
 
     /**
