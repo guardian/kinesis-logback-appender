@@ -4,3 +4,8 @@
 *.jar
 *.war
 *.ear
+*.iml
+
+# Package Folders #
+.idea
+target

@@ -20,11 +20,10 @@ import com.amazonaws.regions.Regions;
  * Contains constants and default configuration values for the appender
  */
 public class AppenderConstants {
-  public static final String USER_AGENT_STRING = "kinesis-logback-appender/1.1.0";
+  public static final String USER_AGENT_STRING = "kinesis-logback-appender/1.2.0";
   // Default values
   public static final String DEFAULT_ENCODING = "UTF-8";
   public static final int DEFAULT_MAX_RETRY_COUNT = 3;
-  public static final long DEFAULT_BACKOFF_INTERVAL_MSEC = 100;
   public static final int DEFAULT_BUFFER_SIZE = 2000;
   public static final int DEFAULT_THREAD_COUNT = 20;
   public static final int DEFAULT_SHUTDOWN_TIMEOUT_SEC = 30;
