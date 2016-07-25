@@ -15,13 +15,6 @@
 
 package com.gu.logback.appender.kinesis.helpers;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.joda.time.DateTime;
-import org.joda.time.Period;
-import org.joda.time.format.PeriodFormat;
-
 import com.amazonaws.handlers.AsyncHandler;
 import com.amazonaws.services.kinesis.model.PutRecordRequest;
 import com.amazonaws.services.kinesis.model.PutRecordResult;
@@ -31,14 +24,14 @@ import com.gu.logback.appender.kinesis.KinesisAppender;
  * Gathers information on how many put requests made by AWS SDK's async client,
  * succeeded or failed since the beginning
  */
-public class AsyncPutCallStatsReporter implements AsyncHandler<PutRecordRequest, PutRecordResult> {
+public class KinesisStatsReporter implements AsyncHandler<PutRecordRequest, PutRecordResult> {
 
   private final String appenderName;
   private long successfulRequestCount;
   private long failedRequestCount;
-  private final KinesisAppender appender;
+  private final KinesisAppender<?> appender;
 
-  public AsyncPutCallStatsReporter(KinesisAppender appender) {
+  public KinesisStatsReporter(KinesisAppender<?> appender) {
     this.appenderName = appender.getStreamName();
     this.appender = appender;
   }

@@ -8,4 +8,7 @@
 
 # Package Folders #
 .idea
+.project
+.classpath
+.settings
 target
