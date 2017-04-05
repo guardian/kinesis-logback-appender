@@ -20,7 +20,7 @@
 
   <groupId>com.gu</groupId>
   <artifactId>kinesis-logback-appender</artifactId>
-  <version>1.3.0</version>
+  <version>1.4.0</version>
 
   <name>LOGBack Appender for pushing logs to Kinesis</name>
   <description>This is an implementation of the AWS - Labs log4j appender for LOGBack.</description>

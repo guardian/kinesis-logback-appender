@@ -19,6 +19,7 @@ import com.amazonaws.auth.ClasspathPropertiesFileCredentialsProvider;
 import com.amazonaws.auth.EnvironmentVariableCredentialsProvider;
 import com.amazonaws.auth.InstanceProfileCredentialsProvider;
 import com.amazonaws.auth.SystemPropertiesCredentialsProvider;
+import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 
 /**
  * 
@@ -29,11 +30,12 @@ import com.amazonaws.auth.SystemPropertiesCredentialsProvider;
  *  - Instance profile credentials delivered through the Amazon EC2 metadata
  *  - Environment Variables - AWS_ACCESS_KEY_ID and AWS_SECRET_KEY
  *  - Java System Properties - aws.accessKeyId and aws.secretKey
- * 
+ *  - Profile Credentials - default profile unless AWS_PROFILE environment variable set
  */
 public final class CustomCredentialsProviderChain extends AWSCredentialsProviderChain {
   public CustomCredentialsProviderChain() {
     super(new ClasspathPropertiesFileCredentialsProvider(), new InstanceProfileCredentialsProvider(),
-        new SystemPropertiesCredentialsProvider(), new EnvironmentVariableCredentialsProvider());
+        new SystemPropertiesCredentialsProvider(), new EnvironmentVariableCredentialsProvider(),
+        new ProfileCredentialsProvider());
   }
 }
