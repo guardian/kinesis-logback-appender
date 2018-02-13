@@ -18,6 +18,7 @@ package com.gu.logback.appender.kinesis;
 import java.nio.ByteBuffer;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.services.kinesisfirehose.AmazonKinesisFirehoseAsyncClient;
@@ -53,7 +54,7 @@ public class FirehoseAppender<Event extends DeferredProcessingAware>
 
   @Override
   protected void validateStreamName(AmazonKinesisFirehoseAsyncClient client, String streamName) {
-    DescribeDeliveryStreamResult describeResult = null;
+    DescribeDeliveryStreamResult describeResult;
     try {
       describeResult = getClient()
           .describeDeliveryStream(new DescribeDeliveryStreamRequest().withDeliveryStreamName(streamName));
@@ -66,6 +67,10 @@ public class FirehoseAppender<Event extends DeferredProcessingAware>
     catch(ResourceNotFoundException rnfe) {
       setInitializationFailed(true);
       addError("Stream " + streamName + " doesn't exist for appender: " + name, rnfe);
+    }
+    catch(AmazonServiceException ase) {
+      setInitializationFailed(true);
+      addError("Error connecting to AWS to verify stream " + streamName + " for appender: " + name, ase);
     }
   }
 
