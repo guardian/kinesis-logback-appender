@@ -40,6 +40,15 @@ Supports both Kinesis and Kinesis Firehose streams.
 
 Use `com.gu.logback.appender.kinesis.KinesisAppender` for Kinesis or `com.gu.logback.appender.kinesis.FirehoseAppender` for Kinesis Firehose.
 
+## Performance and reliability notes
+
+This appender is performant but will block if the Kinesis stream throughput is exceeded. In order to guard against this you might want to consider:
+  * ensure you have calculated how many shards you need based on your expected throughput 
+  * alerting on write throughput exceeded on the Kinesis stream(s)
+  * setting up an autoscaling approach that will automatically scale your shards up and down appropriately [AWS docs](https://aws.amazon.com/about-aws/whats-new/2016/11/amazon-kinesis-streams-scaling-and-shard-limit-monitoring-using-new-apis/)
+  * configuring the AWS client to not retry on failure so that log lines are discarded when stream throughput is exceeded rather than backing up and causing a cascading failure
+  * isolating putMessage calls on a separate threadpool
+
 ## Testing locally
 
 In order to test this you can simply use `mvn install` (to deploy to your local machine).
