@@ -241,6 +241,7 @@
       <artifactId>jackson-dataformat-cbor</artifactId>
       <version>${jackson.version}</version>
     </dependency>
+
   </dependencies>
 
   <properties>
