@@ -46,7 +46,7 @@ This appender is performant but will block if the Kinesis stream throughput is e
   * ensure you have calculated how many shards you need based on your expected throughput 
   * alerting on write throughput exceeded on the Kinesis stream(s)
   * setting up an autoscaling approach that will automatically scale your shards up and down appropriately [AWS docs](https://aws.amazon.com/about-aws/whats-new/2016/11/amazon-kinesis-streams-scaling-and-shard-limit-monitoring-using-new-apis/)
-  * configuring the AWS client to not retry on failure so that log lines are discarded when stream throughput is exceeded rather than backing up and causing a cascading failure
+  * configuring the AWS client to not retry on failure so that log lines are discarded when stream throughput is exceeded rather than backing up and causing a cascading failure (see [example on dotcom](https://github.com/guardian/frontend/blob/master/common/app/common/Logback/KinesisAdapter.scala))
   * isolating putMessage calls on a separate threadpool
 
 ## Testing locally
