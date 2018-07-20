@@ -47,7 +47,7 @@ This appender is performant but will block if the Kinesis stream throughput is e
   * alerting on write throughput exceeded on the Kinesis stream(s)
   * setting up an autoscaling approach that will automatically scale your shards up and down appropriately [AWS docs](https://aws.amazon.com/about-aws/whats-new/2016/11/amazon-kinesis-streams-scaling-and-shard-limit-monitoring-using-new-apis/)
   * configuring the AWS client to not retry on failure so that log lines are discarded when stream throughput is exceeded rather than backing up and causing a cascading failure
-  * isolating putMessage calls on a separate threadpool
+  * wrapping the appender in `AsyncAppender`, which can be configured to automatically drop overflowing messages on blocking
 
 ## Testing locally
 
