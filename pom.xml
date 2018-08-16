@@ -249,7 +249,7 @@
     <!-- JAVA -->
     <java.version>1.8</java.version>
     <java.source.encoding>${general.encoding}</java.source.encoding>
-    <aws-java-sdk.version>1.11.8</aws-java-sdk.version>
+    <aws-java-sdk.version>1.11.384</aws-java-sdk.version>
     <logback.version>1.2.3</logback.version>
     <jackson.version>2.9.2</jackson.version>
     <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
