@@ -6,6 +6,7 @@ package com.gu.logback.appender.kinesis;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -19,6 +20,7 @@ import com.amazonaws.retry.PredefinedRetryPolicies;
 import com.amazonaws.retry.RetryPolicy;
 import com.gu.logback.appender.kinesis.helpers.BlockFastProducerPolicy;
 import com.gu.logback.appender.kinesis.helpers.CustomCredentialsProviderChain;
+import com.gu.logback.appender.kinesis.helpers.NamedThreadFactory;
 import com.gu.logback.appender.kinesis.helpers.Validator;
 
 import ch.qos.logback.core.AppenderBase;
@@ -87,7 +89,7 @@ public abstract class BaseKinesisAppender<Event extends DeferredProcessingAware,
     BlockingQueue<Runnable> taskBuffer = new LinkedBlockingDeque<Runnable>(bufferSize);
     threadPoolExecutor = new ThreadPoolExecutor(threadCount, threadCount,
                                                 AppenderConstants.DEFAULT_THREAD_KEEP_ALIVE_SEC, TimeUnit.SECONDS,
-                                                taskBuffer, new BlockFastProducerPolicy());
+                                                taskBuffer, setupThreadFactory(), new BlockFastProducerPolicy());
     threadPoolExecutor.prestartAllCoreThreads();
 
     this.client = createClient(credentials, clientConfiguration, threadPoolExecutor);
@@ -176,6 +178,13 @@ public abstract class BaseKinesisAppender<Event extends DeferredProcessingAware,
    * @throws Exception if unable to add message
    */
   protected abstract void putMessage(String message) throws Exception;
+
+  /**
+   * Creates the thread factory to be used by the {@link #threadPoolExecutor}.
+   */
+  private ThreadFactory setupThreadFactory() {
+    return new NamedThreadFactory(getClass().getSimpleName() + "[" + streamName + "]-");
+  }
 
   /**
    * Determine region. If not specified tries to determine region from where the
