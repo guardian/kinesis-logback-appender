@@ -19,6 +19,7 @@ import java.nio.ByteBuffer;
 import java.util.UUID;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.services.kinesis.AmazonKinesisAsyncClient;
@@ -40,7 +41,7 @@ import ch.qos.logback.core.spi.DeferredProcessingAware;
 public class KinesisAppender<Event extends DeferredProcessingAware>
     extends BaseKinesisAppender<Event, AmazonKinesisAsyncClient> {
 
-  private KinesisStatsReporter asyncCallHander = new KinesisStatsReporter(this);
+  private KinesisStatsReporter asyncCallHandler = new KinesisStatsReporter(this);
 
   @Override
   protected AmazonKinesisAsyncClient createClient(AWSCredentialsProvider credentials, ClientConfiguration configuration,
@@ -50,7 +51,7 @@ public class KinesisAppender<Event extends DeferredProcessingAware>
 
   @Override
   protected void validateStreamName(AmazonKinesisAsyncClient client, String streamName) {
-    DescribeStreamResult describeResult = null;
+    DescribeStreamResult describeResult;
     try {
       describeResult = getClient().describeStream(streamName);
       String streamStatus = describeResult.getStreamDescription().getStreamStatus();
@@ -63,13 +64,17 @@ public class KinesisAppender<Event extends DeferredProcessingAware>
       setInitializationFailed(true);
       addError("Stream " + streamName + " doesn't exist for appender: " + name, rnfe);
     }
+    catch(AmazonServiceException ase) {
+      setInitializationFailed(true);
+      addError("Error connecting to AWS to verify stream " + streamName + " for appender: " + name, ase);
+    }
   }
 
   @Override
   protected void putMessage(String message) throws Exception {
     ByteBuffer data = ByteBuffer.wrap(message.getBytes(getEncoding()));
     getClient().putRecordAsync(new PutRecordRequest().withPartitionKey(UUID.randomUUID().toString())
-        .withStreamName(getStreamName()).withData(data), asyncCallHander);
+        .withStreamName(getStreamName()).withData(data), asyncCallHandler);
   }
 
 }
