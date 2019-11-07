@@ -68,7 +68,7 @@ public class FirehoseAppender<Event extends DeferredProcessingAware>
     DescribeDeliveryStreamResponse describeResponse;
     try {
       describeResponse = getClient()
-        .describeDeliveryStream(DescribeDeliveryStreamRequest.builder().deliveryStreamName(streamName).build())
+        .describeDeliveryStream(b -> b.deliveryStreamName(streamName).build())
         .get();
       DeliveryStreamStatus streamStatus = describeResponse.deliveryStreamDescription().deliveryStreamStatus();
       if(!DeliveryStreamStatus.ACTIVE.equals(streamStatus)) {

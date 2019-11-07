@@ -80,11 +80,7 @@ public abstract class BaseKinesisAppender<Event extends DeferredProcessingAware,
     }
 
     ClientOverrideConfiguration clientConfiguration = ClientOverrideConfiguration.builder()
-      .retryPolicy(b -> 
-        b.numRetries(maxRetries)
-          .retryCondition(RetryPolicy.defaultRetryPolicy().retryCondition())
-          .backoffStrategy(RetryPolicy.defaultRetryPolicy().backoffStrategy())
-      )
+      .retryPolicy(RetryPolicy.defaultRetryPolicy().toBuilder().numRetries(maxRetries).build())
       .putHeader("User-Agent", AppenderConstants.USER_AGENT_STRING)
       .build();
 
