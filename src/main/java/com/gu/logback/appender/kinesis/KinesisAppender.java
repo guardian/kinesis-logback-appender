@@ -57,7 +57,7 @@ public class KinesisAppender<Event extends DeferredProcessingAware>
       .credentialsProvider(credentials)
       .region(region)
       .overrideConfiguration(configuration)
-      .asyncConfiguration(b -> b.advancedOption(SdkAdvancedAsyncClientOption.FUTURE_COMPLETION_EXECUTOR, executor))
+      .asyncConfiguration(b -> b.advancedOption(SdkAdvancedAsyncClientOption.FUTURE_COMPLETION_EXECUTOR, executor));
     
     endpointOverride.ifPresent(endpoint -> builder.endpointOverride(endpoint));
     
