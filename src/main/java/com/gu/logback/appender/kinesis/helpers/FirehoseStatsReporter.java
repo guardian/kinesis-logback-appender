@@ -15,16 +15,15 @@
 
 package com.gu.logback.appender.kinesis.helpers;
 
-import com.amazonaws.handlers.AsyncHandler;
-import com.amazonaws.services.kinesisfirehose.model.PutRecordRequest;
-import com.amazonaws.services.kinesisfirehose.model.PutRecordResult;
+import java.util.function.BiConsumer;
+import software.amazon.awssdk.services.firehose.model.PutRecordResponse;
 import com.gu.logback.appender.kinesis.FirehoseAppender;
 
 /**
  * Gathers information on how many put requests made by AWS SDK's async client,
  * succeeded or failed since the beginning
  */
-public class FirehoseStatsReporter implements AsyncHandler<PutRecordRequest, PutRecordResult> {
+public final class FirehoseStatsReporter implements BiConsumer<PutRecordResponse,Throwable> {
 
   private final String appenderName;
   private long successfulRequestCount;
@@ -37,23 +36,25 @@ public class FirehoseStatsReporter implements AsyncHandler<PutRecordRequest, Put
   }
 
   /**
-   * This method is invoked when there is an exception in sending a log record
-   * to Kinesis. These logs would end up in the application log if configured
-   * properly.
+   * This method is invoked when an operation to send a log record to Kinesis has
+   * completed either successfully or not. These logs would end up in the application
+   * log if configured properly.
    */
   @Override
-  public void onError(Exception exception) {
-    failedRequestCount++;
-    appender.addError("Failed to publish a log entry to kinesis using appender: " + appenderName, exception);
+  public final void accept(PutRecordResponse response, Throwable exception) {
+    if (exception != null) {
+      failedRequestCount++;
+      appender.addError("Failed to publish a log entry to kinesis using appender: " + appenderName, exception);
+    } else {
+      successfulRequestCount++;
+    }
   }
 
-  /**
-   * This method is invoked when a log record is successfully sent to Kinesis.
-   * Though this is not too useful for production use cases, it provides a good
-   * debugging tool while tweaking parameters for the appender.
-   */
-  @Override
-  public void onSuccess(PutRecordRequest request, PutRecordResult result) {
-    successfulRequestCount++;
+  public final long getSuccessfulRequestCount() {
+    return successfulRequestCount;
+  }
+
+  public final long getFailedRequestCount() {
+    return failedRequestCount;
   }
 }

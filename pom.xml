@@ -198,18 +198,23 @@
   <dependencies>
 
     <dependency>
-      <groupId>com.amazonaws</groupId>
-      <artifactId>aws-java-sdk-core</artifactId>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>core</artifactId>
       <version>${aws-java-sdk.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.amazonaws</groupId>
-      <artifactId>aws-java-sdk-sts</artifactId>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>sts</artifactId>
       <version>${aws-java-sdk.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.amazonaws</groupId>
-      <artifactId>aws-java-sdk-kinesis</artifactId>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>firehose</artifactId>
+      <version>${aws-java-sdk.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>kinesis</artifactId>
       <version>${aws-java-sdk.version}</version>
     </dependency>
 
@@ -249,7 +254,7 @@
     <!-- JAVA -->
     <java.version>1.8</java.version>
     <java.source.encoding>${general.encoding}</java.source.encoding>
-    <aws-java-sdk.version>1.11.384</aws-java-sdk.version>
+    <aws-java-sdk.version>2.10.9</aws-java-sdk.version>
     <logback.version>1.2.3</logback.version>
     <jackson.version>2.9.5</jackson.version>
     <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>

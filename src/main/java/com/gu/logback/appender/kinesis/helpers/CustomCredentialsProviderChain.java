@@ -14,12 +14,11 @@
  ******************************************************************************/
 package com.gu.logback.appender.kinesis.helpers;
 
-import com.amazonaws.auth.AWSCredentialsProviderChain;
-import com.amazonaws.auth.ClasspathPropertiesFileCredentialsProvider;
-import com.amazonaws.auth.EnvironmentVariableCredentialsProvider;
-import com.amazonaws.auth.EC2ContainerCredentialsProviderWrapper;
-import com.amazonaws.auth.SystemPropertiesCredentialsProvider;
-import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProviderChain;
+import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.InstanceProfileCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.SystemPropertyCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 
 /**
  * 
@@ -32,10 +31,11 @@ import com.amazonaws.auth.profile.ProfileCredentialsProvider;
  *  - Java System Properties - aws.accessKeyId and aws.secretKey
  *  - Profile Credentials - default profile unless AWS_PROFILE environment variable set
  */
-public final class CustomCredentialsProviderChain extends AWSCredentialsProviderChain {
-  public CustomCredentialsProviderChain() {
-    super(new ClasspathPropertiesFileCredentialsProvider(), new EC2ContainerCredentialsProviderWrapper(),
-        new SystemPropertiesCredentialsProvider(), new EnvironmentVariableCredentialsProvider(),
-        new ProfileCredentialsProvider());
-  }
+public final class CustomCredentialsProviderChain {
+  public final static AwsCredentialsProviderChain chain = AwsCredentialsProviderChain.builder().credentialsProviders(
+    InstanceProfileCredentialsProvider.create(),
+    SystemPropertyCredentialsProvider.create(), 
+    EnvironmentVariableCredentialsProvider.create(),
+    ProfileCredentialsProvider.create()
+  ).build();
 }

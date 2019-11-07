@@ -15,16 +15,15 @@
 
 package com.gu.logback.appender.kinesis.helpers;
 
-import com.amazonaws.handlers.AsyncHandler;
-import com.amazonaws.services.kinesis.model.PutRecordRequest;
-import com.amazonaws.services.kinesis.model.PutRecordResult;
+import java.util.function.BiConsumer;
+import software.amazon.awssdk.services.kinesis.model.PutRecordResponse;
 import com.gu.logback.appender.kinesis.KinesisAppender;
 
 /**
  * Gathers information on how many put requests made by AWS SDK's async client,
  * succeeded or failed since the beginning
  */
-public class KinesisStatsReporter implements AsyncHandler<PutRecordRequest, PutRecordResult> {
+public final class KinesisStatsReporter implements BiConsumer<PutRecordResponse,Throwable> {
 
   private final String appenderName;
   private long successfulRequestCount;
@@ -42,18 +41,20 @@ public class KinesisStatsReporter implements AsyncHandler<PutRecordRequest, PutR
    * properly.
    */
   @Override
-  public void onError(Exception exception) {
-    failedRequestCount++;
-    appender.addError("Failed to publish a log entry to kinesis using appender: " + appenderName, exception);
+  public final void accept(PutRecordResponse response, Throwable exception) {
+    if (exception != null) {
+      failedRequestCount++;
+      appender.addError("Failed to publish a log entry to kinesis using appender: " + appenderName, exception);
+    } else {
+      successfulRequestCount++;
+    }
   }
 
-  /**
-   * This method is invoked when a log record is successfully sent to Kinesis.
-   * Though this is not too useful for production use cases, it provides a good
-   * debugging tool while tweaking parameters for the appender.
-   */
-  @Override
-  public void onSuccess(PutRecordRequest request, PutRecordResult result) {
-    successfulRequestCount++;
+  public final long getSuccessfulRequestCount() {
+    return successfulRequestCount;
+  }
+
+  public final long getFailedRequestCount() {
+    return failedRequestCount;
   }
 }

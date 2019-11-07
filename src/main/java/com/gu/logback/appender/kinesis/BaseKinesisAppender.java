@@ -4,20 +4,20 @@
  */
 package com.gu.logback.appender.kinesis;
 
+import java.net.URI;
+import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import com.amazonaws.AmazonWebServiceClient;
-import com.amazonaws.ClientConfiguration;
-import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.STSAssumeRoleSessionCredentialsProvider;
-import com.amazonaws.regions.Region;
-import com.amazonaws.regions.Regions;
-import com.amazonaws.retry.PredefinedRetryPolicies;
-import com.amazonaws.retry.RetryPolicy;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.core.SdkClient;
+import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
+import software.amazon.awssdk.core.retry.RetryPolicy;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.sts.auth.StsAssumeRoleCredentialsProvider;
 import com.gu.logback.appender.kinesis.helpers.BlockFastProducerPolicy;
 import com.gu.logback.appender.kinesis.helpers.CustomCredentialsProviderChain;
 import com.gu.logback.appender.kinesis.helpers.NamedThreadFactory;
@@ -33,7 +33,7 @@ import ch.qos.logback.core.spi.DeferredProcessingAware;
  * 
  * @since 1.4
  */
-public abstract class BaseKinesisAppender<Event extends DeferredProcessingAware, Client extends AmazonWebServiceClient>
+public abstract class BaseKinesisAppender<Event extends DeferredProcessingAware, Client extends SdkClient>
     extends AppenderBase<Event> {
 
   private String encoding = AppenderConstants.DEFAULT_ENCODING;
@@ -51,7 +51,7 @@ public abstract class BaseKinesisAppender<Event extends DeferredProcessingAware,
   private BlockingQueue<Runnable> taskBuffer;
   private ThreadPoolExecutor threadPoolExecutor;
   private LayoutBase<Event> layout;
-  private AWSCredentialsProvider credentials = new CustomCredentialsProviderChain();
+  private AwsCredentialsProvider credentials = CustomCredentialsProviderChain.chain;
   private Client client;
 
   /**
@@ -79,12 +79,14 @@ public abstract class BaseKinesisAppender<Event extends DeferredProcessingAware,
       return;
     }
 
-    ClientConfiguration clientConfiguration = new ClientConfiguration();
-    clientConfiguration.setMaxErrorRetry(maxRetries);
-    clientConfiguration
-        .setRetryPolicy(new RetryPolicy(PredefinedRetryPolicies.DEFAULT_RETRY_CONDITION,
-                                        PredefinedRetryPolicies.DEFAULT_BACKOFF_STRATEGY, maxRetries, true));
-    clientConfiguration.setUserAgent(AppenderConstants.USER_AGENT_STRING);
+    ClientOverrideConfiguration clientConfiguration = ClientOverrideConfiguration.builder()
+      .retryPolicy(b -> 
+        b.numRetries(maxRetries)
+          .retryCondition(RetryPolicy.defaultRetryPolicy().retryCondition())
+          .backoffStrategy(RetryPolicy.defaultRetryPolicy().backoffStrategy())
+      )
+      .putHeader("User-Agent", AppenderConstants.USER_AGENT_STRING)
+      .build();
 
     BlockingQueue<Runnable> taskBuffer = new LinkedBlockingDeque<Runnable>(bufferSize);
     threadPoolExecutor = new ThreadPoolExecutor(threadCount, threadCount,
@@ -92,16 +94,19 @@ public abstract class BaseKinesisAppender<Event extends DeferredProcessingAware,
                                                 taskBuffer, setupThreadFactory(), new BlockFastProducerPolicy());
     threadPoolExecutor.prestartAllCoreThreads();
 
-    this.client = createClient(credentials, clientConfiguration, threadPoolExecutor);
+    Optional<URI> endpointOverride;
 
-    client.setRegion(findRegion());
     if(!Validator.isBlank(endpoint)) {
       if(!Validator.isBlank(region)) {
         addError("Received configuration for both region as well as Amazon Kinesis endpoint. (" + endpoint
                  + ") will be used as endpoint instead of default endpoint for region (" + region + ")");
       }
-      client.setEndpoint(endpoint);
+      endpointOverride = Optional.of(URI.create(endpoint));
+    } else {
+      endpointOverride = Optional.empty();
     }
+
+    this.client = createClient(credentials, clientConfiguration, threadPoolExecutor, findRegion(), endpointOverride);
 
     validateStreamName(client, streamName);
 
@@ -136,7 +141,7 @@ public abstract class BaseKinesisAppender<Event extends DeferredProcessingAware,
         addError(errorMsg);
       }
     }
-    client.shutdown();
+    client.close();
   }
 
   /**
@@ -196,13 +201,9 @@ public abstract class BaseKinesisAppender<Event extends DeferredProcessingAware,
     boolean regionProvided = !Validator.isBlank(this.region);
     if(!regionProvided) {
       // Determine region from where application is running, or fall back to default region
-      Region currentRegion = Regions.getCurrentRegion();
-      if(currentRegion != null) {
-        return currentRegion;
-      }
-      return Region.getRegion(Regions.fromName(AppenderConstants.DEFAULT_REGION));
+      return Region.of(AppenderConstants.DEFAULT_REGION);
     }
-    return Region.getRegion(Regions.fromName(this.region));
+    return Region.of(this.region);
   }
 
   public LayoutBase<Event> getLayout() {
@@ -373,19 +374,19 @@ public abstract class BaseKinesisAppender<Event extends DeferredProcessingAware,
     this.roleToAssumeArn = roleToAssumeArn;
     if(!Validator.isBlank(roleToAssumeArn)) {
       String sessionId = "session" + Math.random();
-      STSAssumeRoleSessionCredentialsProvider remoteAccountCredentials = new STSAssumeRoleSessionCredentialsProvider(credentials,
-                                                                                                                     roleToAssumeArn,
-                                                                                                                     sessionId);
+      StsAssumeRoleCredentialsProvider remoteAccountCredentials = 
+        StsAssumeRoleCredentialsProvider.builder().refreshRequest(builder ->
+          builder.roleArn(roleToAssumeArn).roleSessionName(sessionId).build()).build();
 
       credentials = remoteAccountCredentials;
     }
   }
 
-  public AWSCredentialsProvider getCredentialsProvider() {
+  public AwsCredentialsProvider getCredentialsProvider() {
     return credentials;
   }
 
-  public void setCredentialsProvider(AWSCredentialsProvider credentialsProvider) {
+  public void setCredentialsProvider(AwsCredentialsProvider credentialsProvider) {
     this.credentials = credentialsProvider;
   }
 
@@ -433,8 +434,7 @@ public abstract class BaseKinesisAppender<Event extends DeferredProcessingAware,
     this.initializationFailed = initializationFailed;
   }
 
-  protected abstract Client createClient(AWSCredentialsProvider credentials, ClientConfiguration configuration,
-      ThreadPoolExecutor executor);
+  protected abstract Client createClient(AwsCredentialsProvider credentials, ClientOverrideConfiguration configuration, ThreadPoolExecutor executor, Region region, Optional<URI> endpointOverride);
 
   protected Client getClient() {
     return client;
