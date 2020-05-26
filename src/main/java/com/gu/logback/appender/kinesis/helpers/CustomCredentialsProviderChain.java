@@ -16,6 +16,7 @@ package com.gu.logback.appender.kinesis.helpers;
 
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProviderChain;
 import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.ContainerCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.InstanceProfileCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.SystemPropertyCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
@@ -33,8 +34,9 @@ import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
  */
 public final class CustomCredentialsProviderChain {
   public final static AwsCredentialsProviderChain chain = AwsCredentialsProviderChain.builder().credentialsProviders(
+    ContainerCredentialsProvider.builder().build(),
     InstanceProfileCredentialsProvider.create(),
-    SystemPropertyCredentialsProvider.create(), 
+    SystemPropertyCredentialsProvider.create(),
     EnvironmentVariableCredentialsProvider.create(),
     ProfileCredentialsProvider.create()
   ).build();
