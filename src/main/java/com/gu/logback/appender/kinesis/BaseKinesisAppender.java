@@ -13,13 +13,13 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.core.SdkClient;
 import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
 import software.amazon.awssdk.core.retry.RetryPolicy;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sts.auth.StsAssumeRoleCredentialsProvider;
 import com.gu.logback.appender.kinesis.helpers.BlockFastProducerPolicy;
-import com.gu.logback.appender.kinesis.helpers.CustomCredentialsProviderChain;
 import com.gu.logback.appender.kinesis.helpers.NamedThreadFactory;
 import com.gu.logback.appender.kinesis.helpers.Validator;
 
@@ -51,7 +51,7 @@ public abstract class BaseKinesisAppender<Event extends DeferredProcessingAware,
   private BlockingQueue<Runnable> taskBuffer;
   private ThreadPoolExecutor threadPoolExecutor;
   private LayoutBase<Event> layout;
-  private AwsCredentialsProvider credentials = CustomCredentialsProviderChain.chain;
+  private AwsCredentialsProvider credentials = DefaultCredentialsProvider.create();
   private Client client;
 
   /**
