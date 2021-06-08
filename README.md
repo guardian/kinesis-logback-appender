@@ -72,6 +72,8 @@ In order to release this to maven you'll need to have a settings file at `~/.m2/
 </settings>
 ```
 
+You'll also need the mvn command installed.  You can do `brew install mvn` at the command line.
+
 Once you've got that you can use `mvn clean deploy` to deploy your snapshot to sonatype. This will only release to the snapshot repo (you can add `resolvers += "Sonatype snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"` to test resolution of this).
 
 Finally when ready run `mvn release:clean release:prepare` and follow the prompts. The tagging convention we've been using is to use the same as the version we are shipping (no project name). Once this has completed you need to do one more step to actually release it on maven central: `mvn release:perform`.
