@@ -224,29 +224,6 @@
       <artifactId>logback-classic</artifactId>
       <version>${logback.version}</version>
     </dependency>
-
-    <!--
-      Pull in an updated version of jackson libraries as the one's AWS use have security vulnerabilities.
-      We cannot simply update the AWS libraries as jackson 2.7+ doesn't support java6 and the AWS libraries compile to java6.
-      See https://github.com/aws/aws-sdk-java/pull/1373
-    -->
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>${jackson.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>${jackson.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.fasterxml.jackson.dataformat</groupId>
-      <artifactId>jackson-dataformat-cbor</artifactId>
-      <version>${jackson.version}</version>
-    </dependency>
   </dependencies>
 
   <properties>
@@ -255,9 +232,8 @@
     <!-- JAVA -->
     <java.version>1.8</java.version>
     <java.source.encoding>${general.encoding}</java.source.encoding>
-    <aws-java-sdk.version>2.16.69</aws-java-sdk.version>
+    <aws-java-sdk.version>2.17.248</aws-java-sdk.version>
     <logback.version>1.2.3</logback.version>
-    <jackson.version>2.12.2</jackson.version>
     <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
   </properties>
 </project>
