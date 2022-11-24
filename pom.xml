@@ -19,7 +19,7 @@
 
   <groupId>com.gu</groupId>
   <artifactId>kinesis-logback-appender</artifactId>
-  <version>2.1.1-SNAPSHOT</version>
+  <version>2.1.1</version>
 
   <name>LOGBack Appender for pushing logs to Kinesis</name>
   <description>This is an implementation of the AWS - Labs log4j appender for LOGBack.</description>
@@ -37,7 +37,7 @@
   <scm>
     <connection>scm:git:https://github.com/guardian/kinesis-logback-appender</connection>
     <developerConnection>scm:git:git@github.com:guardian/kinesis-logback-appender.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>kinesis-logback-appender-2.1.1</tag>
     <url>https://github.com/guardian/kinesis-logback-appender</url>
   </scm>
 
