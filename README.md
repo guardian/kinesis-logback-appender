@@ -1,3 +1,7 @@
+# Deprecated
+
+Please use [devx-logs](https://github.com/guardian/devx-logs/tree/main/ec2) for shipping logs to Central ELK now!
+
 [![Maven Central](https://img.shields.io/maven-central/v/com.gu/kinesis-logback-appender.svg)](https://mvnrepository.com/artifact/com.gu/kinesis-logback-appender)
 
 # LOGBack Appender for Amazon Kinesis
