@@ -1,7 +1,10 @@
 # Deprecated
 
-Internals users can use [devx-logs](https://github.com/guardian/devx-logs/tree/main/ec2) for shipping logs to Central ELK now!
-External users, consider using [log4j-aws-appenders](https://github.com/kdgregory/log4j-aws-appenders) as a replacement for this library.
+This library included a Logback appender for Kinesis, its gradually stopped getting maintained over the years and we've now developed better solutions for shipping logs.
+
+For internal users we recommend switching to [devx-logs](https://github.com/guardian/devx-logs/tree/main/ec2) which allows shipping logs to Central ELK without adding any dependencies to your project.
+
+For external users it may be worth switching to [log4j-aws-appenders](https://github.com/kdgregory/log4j-aws-appenders) which has much the same functionality as this library but is better maintained.
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.gu/kinesis-logback-appender.svg)](https://mvnrepository.com/artifact/com.gu/kinesis-logback-appender)
 
