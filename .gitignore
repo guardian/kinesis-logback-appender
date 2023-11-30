@@ -8,6 +8,8 @@
 
 # Package Folders #
 .idea
+.vscode
+.metals
 .project
 .classpath
 .settings
